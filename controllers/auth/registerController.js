@@ -17,6 +17,7 @@ const RegisterController = {
 				.pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
 				.required(),
 			repeat_password: Joi.ref("password"),
+			RegisterAs: Joi.string().required(),
 		});
 
 		const {error} = registerSchema.validate(req.body);
@@ -41,12 +42,13 @@ const RegisterController = {
 			return next(error);
 		}
 
-		const {name, email, password} = req.body;
+		const {name, email, password, RegisterAs} = req.body;
 
 		const user = new User({
 			name,
 			email,
 			password,
+			RegisterAs,
 		});
 
 		const result = await user.save();
