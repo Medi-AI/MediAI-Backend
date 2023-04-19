@@ -12,6 +12,7 @@ const RegisterController = {
 		console.log(req.body);
 		const registerSchema = Joi.object({
 			name: Joi.string().min(2).max(30).required(),
+			username: Joi.string().min(3).max(20).required(),
 			email: Joi.string().email().required(),
 			password: Joi.string()
 				.pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
