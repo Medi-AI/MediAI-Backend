@@ -1,3 +1,3 @@
 const CustomErrorHandler = require("./CustomErrorHandler");
 
-module.exports = {CustomErrorHandler};
+module.exports = { CustomErrorHandler };
