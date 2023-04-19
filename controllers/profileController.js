@@ -1,7 +1,8 @@
 const Joi = require("joi");
+const {ProfileModel} = require("../models");
 
 const ProfileController = {
-	profile(req, res, next) {
+	async profile(req, res, next) {
 		console.log(req.body);
 		//Validation using Joi
 		const profileSchema = Joi.object({
@@ -20,6 +21,59 @@ const ProfileController = {
 		if (error) {
 			return next(error);
 		}
+
+		try {
+			const exists = await ProfileModel.exists({
+				username: req.body.username,
+			});
+
+			if (exists) {
+				return next(
+					CustomErrorHandler.alreadyExists(
+						"This username is already exists",
+					),
+				);
+			}
+		} catch (error) {
+			return next(error);
+		}
+
+		const {
+			username,
+			dob,
+			gender,
+			bloodgrp,
+			phoneno,
+			emergencyContact,
+			address,
+			medicalhistory,
+			allergies,
+		} = req.body;
+
+		const newProfile = new ProfileModel({
+			username,
+			dob,
+			gender,
+			bloodgrp,
+			phoneno,
+			emergencyContact,
+			address,
+			medicalhistory,
+			allergies,
+		});
+
+		const result = await newProfile.save();
+
+		if (!result) {
+			return next(
+				new CustomErrorHandler(
+					402,
+					"Profile not saved!",
+				),
+			);
+		}
+
+		res.status(200).json({message: "Profile added Successfully"});
 	},
 };
 
