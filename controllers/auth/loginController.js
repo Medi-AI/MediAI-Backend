@@ -28,7 +28,7 @@ const LoginController = {
 			if (!user) {
 				return next(
 					CustomErrorHandler.wrongCredentials(
-						"Invalid Email",
+						"You haven't register signup",
 					),
 				);
 			}
