@@ -16,6 +16,7 @@ mongoose.connect(DB_URL)
 		console.log(err);
 	});
 
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
 

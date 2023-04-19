@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const {ProfileModel} = require("../models");
+const {CustomErrorHandler} = require("../services");
 
 const ProfileController = {
 	async profile(req, res, next) {

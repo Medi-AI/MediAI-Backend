@@ -20,11 +20,12 @@ const RegisterController = {
 			repeat_password: Joi.ref("password"),
 			RegisterAs: Joi.string().required(),
 		});
-
+		console.log("before error");
 		const {error} = registerSchema.validate(req.body);
 
 		if (error) {
 			return next(error);
+			console.log("after error");
 		}
 
 		try {

@@ -6,6 +6,7 @@ const profileSchema = new Schema(
 	{
 		username: {type: String, required: true, unique: true},
 		dob: {type: String, required: true},
+
 		gender: {type: String, required: true},
 		bloodgrp: {type: String, required: true},
 		address: {type: String, required: true},
