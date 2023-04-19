@@ -6,13 +6,14 @@ const ProfileController = {
 		//Validation using Joi
 		const profileSchema = Joi.object({
 			username: Joi.string().min(2).max(30).required(),
-			age: Joi.number().min(1).max(100).required(),
-			gender: Joi.Gender().required(),
+			dob: Joi.string().min(1).max(100).required(),
+			gender: Joi.string().required(),
 			bloodgrp: Joi.string().required(),
+			phoneno: Joi.string().required(),
+			emergencyContact: Joi.string().required(),
 			address: Joi.string().required(),
 			medicalhistory: Joi.string().required(),
 			allergies: Joi.string(),
-			emergencyContact: Joi.number().required(),
 		});
 
 		const {error} = profileSchema.validate(req.body);
