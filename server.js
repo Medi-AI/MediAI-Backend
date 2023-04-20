@@ -1,8 +1,13 @@
 const express = require("express");
 const cors = require("cors");
-const { APP_PORT, DB_URL } = require("./config");
-const router = require("./routes/router");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
+const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
+
+const { APP_PORT, DB_URL } = require("./config");
+
+const router = require("./routes/router");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -16,9 +21,15 @@ mongoose
     console.log(err);
   });
 
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
+
+app.use(
+  cors({
+    exposedHeaders: ["mediai-auth-token"],
+  })
+);
 
 app.use(router);
 app.use(errorHandler);

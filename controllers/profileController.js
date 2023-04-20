@@ -1,73 +1,38 @@
-const Joi = require("joi");
-const { ProfileModel } = require("../models");
+const _ = require("lodash");
+const { ProfileModel, validateProfile } = require("../models/profile");
 const { CustomErrorHandler } = require("../services");
 
 const ProfileController = {
   async profile(req, res, next) {
-    console.log(req.body);
-    //Validation using Joi
-    const profileSchema = Joi.object({
-      username: Joi.string().min(2).max(30).required(),
-      dob: Joi.string().min(1).max(100).required(),
-      gender: Joi.string().required(),
-      bloodgrp: Joi.string().required(),
-      phoneno: Joi.string().required(),
-      emergencyContact: Joi.string().required(),
-      address: Joi.string().required(),
-      medicalhistory: Joi.string().required(),
-      allergies: Joi.string(),
-    });
+    const { error } = validateProfile(req.body);
+    if (error) return next(error);
 
-    const { error } = profileSchema.validate(req.body);
-    if (error) {
-      return next(error);
-    }
+    let profile = await ProfileModel.findOne({ username: req.body.username });
+    if (profile)
+      return next(
+        CustomErrorHandler.alreadyExists("This username is already exists")
+      );
 
-    try {
-      const exists = await ProfileModel.exists({
-        username: req.body.username,
-      });
+    profile = new ProfileModel(
+      _.pick(req.body, [
+        "name",
+        "dob",
+        "gender",
+        "bloodgrp",
+        "phoneno",
+        "emergencyContact",
+        "address",
+        "medicalhistory",
+        "allergies",
+      ])
+    );
+    await profile.save();
 
-      if (exists) {
-        return next(
-          CustomErrorHandler.alreadyExists("This username is already exists")
-        );
-      }
-    } catch (error) {
-      return next(error);
-    }
-
-    const {
-      username,
-      dob,
-      gender,
-      bloodgrp,
-      phoneno,
-      emergencyContact,
-      address,
-      medicalhistory,
-      allergies,
-    } = req.body;
-
-    const newProfile = new ProfileModel({
-      username,
-      dob,
-      gender,
-      bloodgrp,
-      phoneno,
-      emergencyContact,
-      address,
-      medicalhistory,
-      allergies,
-    });
-
-    const result = await newProfile.save();
-
-    if (!result) {
+    if (!profile) {
       return next(new CustomErrorHandler(402, "Profile not saved!"));
     }
 
-    res.status(200).json({ message: "Profile added Successfully" });
+    res.status(200).json({ message: "Profile Saved" });
   },
 };
 

@@ -1,5 +1,5 @@
-const LoginController = require("./auth/loginController");
-const RegisterController = require("./auth/registerController");
+const LoginController = require("./loginController");
+const RegisterController = require("./registerController");
 const ProfileController = require("./profileController");
 const UploadController = require("./drive/uploadController");
 
