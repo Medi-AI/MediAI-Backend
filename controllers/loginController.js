@@ -1,6 +1,8 @@
 const Joi = require("joi");
+const bcrypt = require("bcryptjs");
 
 const { User } = require("../models/User");
+const { ProfileModel } = require("../models/profile");
 const { CustomErrorHandler } = require("../services");
 
 const LoginController = {
@@ -27,17 +29,22 @@ const LoginController = {
       );
     }
 
-    const dbpassword = await user.password;
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
 
-    if (dbpassword !== req.body.password)
+    if (!validPassword)
       return next(CustomErrorHandler.wrongCredentials("Wrong Password"));
+
+    const profile = await ProfileModel.findOne({ _id: user.profileID });
 
     const token = await user.generateAuthToken();
 
     res
       .status(200)
       .header("mediai-auth-token", token)
-      .json({ message: "Login Successful" });
+      .json({ message: "Login Successful", user: user, profile: profile });
   },
 
   async logout(req, res, next) {

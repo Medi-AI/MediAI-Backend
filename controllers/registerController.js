@@ -39,7 +39,7 @@ const RegisterController = {
     res
       .status(200)
       .header("mediai-auth-token", token)
-      .send({ message: "Registeration Successful", name: user.name });
+      .send({ message: "Registeration Successful", user: user });
   },
 };
 

@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     password: { type: String, required: true, minlength: 5, maxlength: 1024 },
     RegisterAs: { type: String, default: "Patient", required: true },
+    profileID: { type: String, default: null },
   },
   { timestamps: true }
 );

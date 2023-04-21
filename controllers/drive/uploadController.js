@@ -1,10 +1,10 @@
-const { CustomErrorHandler } = require("../../services");
 const { google } = require("googleapis");
 const fs = require("fs");
 const path = require("path");
 const process = require("process");
 const { authenticate } = require("@google-cloud/local-auth");
-const multer = require("multer");
+
+const { File } = require("../../models/File");
 
 const CURRENT_DIR = path.join(process.cwd(), "controllers/drive");
 
@@ -80,62 +80,59 @@ async function createFolderIfNotExists(drive, folderName) {
 const uploadController = {
   async upload(req, res, next) {
     try {
+      const { userID, documentName, documentDescription } = req.body;
+      const file = req.file;
+
       const client = await authorize();
       const drive = google.drive({ version: "v3", auth: client });
-      const { userID, name, description, date } = req.body;
 
       const folderID = await createFolderIfNotExists(drive, userID);
 
-      // Multer middleware
-      const upload = multer({
-        storage: multer.memoryStorage(),
-        limits: {
-          fileSize: 5 * 1024 * 1024, // 5 MB
-        },
-      }).single("file");
+      const fileName = file.originalname;
+      const mimeType = file.mimetype;
+      const fileContent = file.buffer;
 
-      upload(req, res, async (err) => {
-        if (err) {
-          return next(new CustomErrorHandler(400, "File upload failed!"));
-        }
+      fs.promises.writeFile(path.join(CURRENT_DIR, fileName), fileContent);
 
-        const file = req.file;
-        const fileName = file.originalname;
-        const mimeType = file.mimetype;
-        const fileContent = file.buffer;
+      const requestBody = {
+        name: fileName,
+        fields: "id",
+        parents: [folderID],
+      };
 
-        fs.promises.writeFile(path.join(CURRENT_DIR, fileName), fileContent);
+      const media = {
+        mimeType: mimeType,
+        body: fs.createReadStream(path.join(CURRENT_DIR, fileName)),
+      };
 
-        const requestBody = {
-          name: fileName,
-          fields: "id",
-          parents: [folderID],
-        };
+      const driveResponse = await drive.files.create({
+        requestBody,
+        media: media,
+      });
 
-        const media = {
-          mimeType: mimeType,
-          body: fs.createReadStream(path.join(CURRENT_DIR, fileName)),
-        };
+      fs.promises.unlink(path.join(CURRENT_DIR, fileName));
 
-        const driveResponse = await drive.files.create({
-          requestBody,
-          media: media,
-        });
+      const fileID = driveResponse.data.id;
 
-        fs.promises.unlink(path.join(CURRENT_DIR, fileName));
+      const fileLink = await drive.files.get({
+        fileId: fileID,
+        fields: "webViewLink",
+      });
 
-        const fileID = driveResponse.data.id;
+      const fileData = {
+        userID,
+        documentName,
+        documentDescription,
+        documentLink: fileLink.data.webViewLink,
+      };
 
-        const fileLink = await drive.files.get({
-          fileId: fileID,
-          fields: "webViewLink",
-        });
+      const newFile = new File(fileData);
+      await newFile.save();
 
-        res.json({
-          success: true,
-          id: fileID,
-          link: fileLink.data.webViewLink,
-        });
+      res.json({
+        message: "File uploaded successfully!",
+        id: fileID,
+        link: fileLink.data.webViewLink,
       });
     } catch (err) {
       return next(err);
@@ -166,27 +163,38 @@ const uploadController = {
 
   async getFiles(req, res, next) {
     try {
-      const client = await authorize();
-      const drive = google.drive({ version: "v3", auth: client });
       const { userID } = req.body;
-
-      const folderID = await createFolderIfNotExists(drive, userID);
-
-      const files = await drive.files.list({
-        q: `'${folderID}' in parents`,
-        fields: "files(id, name, webViewLink, createdTime)",
-      });
-
-      files.data.files.sort((a, b) => {
-        return new Date(b.createdTime) - new Date(a.createdTime);
-      });
+      // const files = await File.find({ userID: userID });
+      const files = await File.find({ userID: userID }).sort({ _id: -1 });
 
       res.json({
         success: true,
-        files: files.data.files,
+        files: files,
       });
     } catch (err) {
       return next(err);
+
+      //   const client = await authorize();
+      //   const drive = google.drive({ version: "v3", auth: client });
+      //   const { userID } = req.body;
+
+      //   const folderID = await createFolderIfNotExists(drive, userID);
+
+      //   const files = await drive.files.list({
+      //     q: `'${folderID}' in parents`,
+      //     fields: "files(id, name, webViewLink, createdTime)",
+      //   });
+
+      //   files.data.files.sort((a, b) => {
+      //     return new Date(b.createdTime) - new Date(a.createdTime);
+      //   });
+
+      //   res.json({
+      //     success: true,
+      //     files: files.data.files,
+      //   });
+      // } catch (err) {
+      //   return next(err);
     }
   },
 

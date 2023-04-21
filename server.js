@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const helmet = require("helmet");
 const Joi = require("joi");
 Joi.objectId = require("joi-objectid")(Joi);
+const bodyParser = require("body-parser");
 
 const { APP_PORT, DB_URL } = require("./config");
 
@@ -30,6 +31,10 @@ app.use(
     exposedHeaders: ["mediai-auth-token"],
   })
 );
+
+app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(router);
 app.use(errorHandler);
