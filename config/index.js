@@ -1,21 +1,19 @@
 require("dotenv").config();
 
-const APP_PORT = process.env.APP_PORT;
+const APP_PORT = process.env.APP_PORT || 5000;
 const DB_URL = process.env.DB_URL;
 
-const jwtPrivateKey = process.env.JWT_PRIVATE_KEY;
+const jwtPrivateKey = process.env.jwtPrivateKey;
 
-// const CLIENT_ID = process.env.CLIENT_ID;
-// const CLIENT_SECRET = process.env.CLIENT_SECRET;
-// const REDIRECT_URI = process.env.REDIRECT_URI;
-// const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN;
 
 module.exports = {
   APP_PORT,
   DB_URL,
   jwtPrivateKey,
-  //   CLIENT_ID,
-  //   CLIENT_SECRET,
-  //   REDIRECT_URI,
-  //   REFRESH_TOKEN,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_REFRESH_TOKEN,
 };
