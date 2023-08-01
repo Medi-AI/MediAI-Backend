@@ -6,13 +6,12 @@ const { google } = require("googleapis");
 
 const CREDENTIALS_FILE_CONTENT = {
   web: {
-    client_id:
-      "247959379477-0nh4pc8p34hh83mac2fdufd6eg5qmara.apps.googleusercontent.com",
-    project_id: "mediai-394614",
+    client_id: "",
+    project_id: "",
     auth_uri: "https://accounts.google.com/o/oauth2/auth",
     token_uri: "https://oauth2.googleapis.com/token",
     auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-    client_secret: "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",
+    client_secret: "",
     redirect_uris: ["http://localhost:5000/google/callback"],
     javascript_origins: ["http://localhost:5000"],
   },
