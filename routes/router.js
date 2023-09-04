@@ -1,14 +1,15 @@
 const express = require("express");
-const router = express.Router();
 const auth = require("../middleware/auth");
 const multer = require("multer");
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+const router = express.Router();
 
 const {
   LoginController,
   RegisterController,
-  UploadController,
+  DriveController,
   ProfileController,
 } = require("../controllers");
 
@@ -20,9 +21,9 @@ router.post("/login", LoginController.login);
 router.post("/register", RegisterController.register);
 router.post("/profile", ProfileController.profile);
 
-router.post("/upload", auth, upload.single("file"), UploadController.upload);
-router.post("/getFolderLink", auth, UploadController.getFolderLink);
-router.post("/getFiles", auth, UploadController.getFiles);
-router.post("/deleteFile", auth, UploadController.deleteFile);
+router.post("/upload", auth, upload.single("file"), DriveController.upload);
+router.post("/getFolderLink", auth, DriveController.getFolderLink);
+router.post("/getFiles", auth, DriveController.getFiles);
+router.post("/deleteFile", auth, DriveController.deleteFile);
 
 module.exports = router;

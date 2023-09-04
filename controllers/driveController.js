@@ -6,11 +6,15 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_REFRESH_TOKEN,
-} = require("../../config");
+} = require("../config");
 
-const { File } = require("../../models/File");
+const { File } = require("../models/File");
 
-const CURRENT_DIR = path.join(process.cwd(), "controllers/drive");
+const CURRENT_DIR = path.join(process.cwd(), "controllers", "uploads");
+
+if (!fs.existsSync(CURRENT_DIR)) {
+  fs.mkdirSync(CURRENT_DIR);
+}
 
 async function loadSavedCredentials() {
   try {
@@ -50,7 +54,7 @@ async function createFolderIfNotExists(drive, folderName) {
   return response.data.id;
 }
 
-const uploadController = {
+const DriveController = {
   async upload(req, res, next) {
     try {
       const { userID, documentName, documentDescription } = req.body;
@@ -96,6 +100,7 @@ const uploadController = {
         userID,
         documentName,
         documentDescription,
+        fileID,
         documentLink: fileLink.data.webViewLink,
       };
 
@@ -158,6 +163,8 @@ const uploadController = {
         fileId: fileID,
       });
 
+      await File.findOneAndDelete({ fileID: fileID });
+
       res.json({
         success: true,
       });
@@ -167,4 +174,4 @@ const uploadController = {
   },
 };
 
-module.exports = uploadController;
+module.exports = DriveController;

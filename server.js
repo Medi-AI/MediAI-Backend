@@ -3,8 +3,9 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const Joi = require("joi");
-Joi.objectId = require("joi-objectid")(Joi);
 const bodyParser = require("body-parser");
+
+Joi.objectId = require("joi-objectid")(Joi);
 
 const { APP_PORT, DB_URL } = require("./config");
 

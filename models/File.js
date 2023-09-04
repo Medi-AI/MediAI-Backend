@@ -6,6 +6,11 @@ const fileSchema = new mongoose.Schema({
   documentDescription: {
     type: String,
   },
+  fileID: {
+    type: String,
+    unique: true,
+    required: true,
+  },
   documentLink: {
     type: String,
     unique: true,

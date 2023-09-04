@@ -5,7 +5,6 @@ const bcrypt = require("bcryptjs");
 
 const RegisterController = {
   async register(req, res, next) {
-    console.log(req.body);
     const { error } = validateUser(req.body);
     if (error) return next(error);
 
@@ -33,8 +32,6 @@ const RegisterController = {
     }
 
     const token = await user.generateAuthToken();
-
-    console.log(token);
 
     res
       .status(200)

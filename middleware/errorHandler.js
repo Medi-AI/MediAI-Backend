@@ -2,8 +2,6 @@ const { ValidationError } = require("joi");
 const { CustomErrorHandler } = require("../services");
 
 const errorHandler = (error, req, res, next) => {
-  console.log("inside error middleware");
-  console.log(error);
   let statusCode = 500;
   let data = {
     message: "Internal Server Error",
